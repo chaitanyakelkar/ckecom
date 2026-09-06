@@ -1,36 +1,41 @@
 package org.ecommerce.ckecom.service;
 
 import org.ecommerce.ckecom.model.Category;
+import org.ecommerce.ckecom.repository.CategoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
-    final private List<Category> categories = new ArrayList<>();
-    private Long idCounter = 1L;
+    // final private List<Category> categories = new ArrayList<>();
+    // private Long idCounter = 1L;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Override
     public List<Category> getAllCategories(){
-        return categories;
+        return categoryRepository.findAll();
     }
 
     @Override
     public void createCategory(Category category){
-        category.setCategoryId(idCounter++);
-        categories.add(category);
+        // category.setCategoryId(idCounter++);
+        categoryRepository.save(category);
     }
 
     @Override
     public String updateCategory(Long categoryId, Category category){
-        Optional<Category> categoryOptional = categories.stream().filter(c -> c.getCategoryId().equals(categoryId)).findFirst();
-        if (categoryOptional.isPresent()) {
-            Category existingCategory = categoryOptional.get();
-            existingCategory.setCategoryName(category.getCategoryName());
+        Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
+        if (optionalCategory.isPresent()) {
+            Category oldCategory = optionalCategory.get();
+            oldCategory.setCategoryName(category.getCategoryName());
+            categoryRepository.save(oldCategory);
             return "Category with categoryId : " + categoryId + " Updated Successfully!";
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
@@ -39,9 +44,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public String deleteCategory(Long categoryId){
-        Optional<Category> categoryOptional = categories.stream().filter(c -> c.getCategoryId().equals(categoryId)).findFirst();
-        if (categoryOptional.isPresent()) {
-            categories.remove(categoryOptional.get());
+        if (categoryRepository.existsById(categoryId)) {
+            categoryRepository.deleteById(categoryId);
             return "Category with categoryId : " + categoryId + " Deleted Successfully!";
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
