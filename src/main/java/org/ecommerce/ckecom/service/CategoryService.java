@@ -1,12 +1,12 @@
 package org.ecommerce.ckecom.service;
 
-import org.ecommerce.ckecom.model.Category;
+import org.ecommerce.ckecom.payload.CategoryDTO;
+import org.ecommerce.ckecom.payload.CategoryResponse;
 
-import java.util.List;
 
 public interface CategoryService {
-    List<Category> getAllCategories();
-    void createCategory(Category category);
-    String updateCategory(Long categoryId, Category category);
-    String deleteCategory(Long categoryId);
+    CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
+    CategoryDTO createCategory(CategoryDTO category);
+    CategoryDTO updateCategory(Long categoryId, CategoryDTO category);
+    CategoryDTO deleteCategory(Long categoryId);
 }
